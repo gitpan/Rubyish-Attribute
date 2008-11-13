@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Rubyish/Attribute.pm
+t/00-load.t
+t/01-simple.t
+t/lib/Animal.pm
+META.yml                                 Module meta-data (added by MakeMaker)
