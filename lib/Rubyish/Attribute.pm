@@ -1,6 +1,10 @@
+
 =head1 NAME
-    Rubyish::Attribute - provide ruby-like accessor builder: attr_accessor, attr_writer and attr_reader.
+
+Rubyish::Attribute - provide ruby-like accessor builder: attr_accessor, attr_writer and attr_reader.
+
 =cut
+
 package Rubyish::Attribute;
 
 use Sub::Exporter;
@@ -11,11 +15,15 @@ Sub::Exporter::setup_exporter({
 
 
 =head1 VERSION
-    version 0.01
+
+    version 0.02
+
 =cut
-our $VERSION = "0.01";
+
+our $VERSION = "0.02";
 
 =head1 SYNOPSIS
+
     #!/usr/bin/env perl
    
     use 5.010;
@@ -26,7 +34,8 @@ our $VERSION = "0.01";
     {
         package Animal;
         
-        use Rubyish::Attribute qw(:all); # use :all to import attr_accessor, attr_writer and attr_reader
+        use Rubyish::Attribute qw(:all); 
+        # use :all to import attr_accessor, attr_writer and attr_reader
 
         attr_accessor( [qw(name color type)] ); 
         # pass a arrayref as the only one parameter
@@ -40,7 +49,9 @@ our $VERSION = "0.01";
         1;
     }
    
-    $dogy = Animal->new()->name("rock")->color("black")->type("unknown"); # new Animal with three attribute
+    $dogy = Animal->new()->name("rock")
+                  ->color("black")->type("unknown");
+    # new Animal with three attribute
 
     say $dogy->name;  #=> rock
     say $dogy->color; #=> black
@@ -49,14 +60,18 @@ our $VERSION = "0.01";
 =head1 FUNCTIONS
 
 =head2 attr_accessor
-    attr_accessor provides getters double as setters.
-    Because all setter return instance itself, now we can manipulate object in ruby way more than ruby.
 
-        attr_accessor( [qw(name color type master)] )
-        $dogy = Animal->new()->name("lucky")->color("white")->type("unknown")->master("shelling");
+attr_accessor provides getters double as setters.
+Because all setter return instance itself, now we can manipulate object in ruby way more than ruby.
 
-    Each attribute could be read by getter as showing in synopsis.
+    attr_accessor( [qw(name color type master)] )
+    $dogy = Animal->new()->name("lucky")->color("white")
+                  ->type("unknown")->master("shelling");
+
+Each attribute could be read by getter as showing in synopsis.
+
 =cut
+
 sub attr_accessor {
     no strict;
     my $methods = shift;
@@ -81,13 +96,16 @@ sub attr_accessor {
 }
 
 =head2 attr_reader
-    attr_reader create only getter for the class you call it
 
-        attr_reader( [qw(name)] ) # pass arrayref
-        $dogy = Animal->new({name => "rock"}) # if we write initialize function in constructor
-        $dogy->name()       #=> rock
-        $dogy->name("jack") #=> cause an exception.
+attr_reader create only getter for the class you call it
+
+    attr_reader( [qw(name)] ) # pass an arrayref
+    $dogy = Animal->new({name => "rock"}) # if we write initialize function in constructor
+    $dogy->name()       #=> rock
+    $dogy->name("jack") #=> cause an exception.
+
 =cut
+
 sub attr_reader {
     no strict;
     my $methods = shift;
@@ -107,13 +125,16 @@ sub attr_reader {
 }
 
 =head2 attr_writer
-    attr_writer create only setter for the class you call it.
 
-        attr_writer( [qw(name)] ) # pass arrayref
-        $dogy = Animal->new()->name("lucky") # initialize and set and get instance itself
-        $dogy->name("jack") # rename it and get the instance itself 
-        $dogy->name         # undef
+attr_writer create only setter for the class you call it.
+
+    attr_writer( [qw(name)] ) # pass arrayref
+    $dogy = Animal->new()->name("lucky") # initialize and set and get instance itself
+    $dogy->name("jack") #=> instance itself 
+    $dogy->name         #=> undef
+
 =cut
+
 sub attr_writer {
     no strict;
     my $methods = shift;
@@ -139,21 +160,29 @@ sub attr_writer {
 }
 
 =head1 SEE ALSO
-    autobox::Core
-    List::Rubyish
+
+L<autobox::Core>, L<List::Rubyish>
 
 =head1 AUTHOR
-    shelling <navyblueshellingford at gmail.com>
-    gugod    <gugod at gugod.org>
+
+shelling <navyblueshellingford at gmail.com>
+gugod    <gugod at gugod.org>
 
 =head2 acknowledgement
-    Thanks to gugod providing testing script and leading me on the way of perl
+
+Thanks to gugod providing testing script and leading me on the way of perl
 
 =head1 REPOSITORY
-    host:       http://github.com/shelling/rubyish-attribute/tree/master
-    checkout:   git clone git://github.com/shelling/rubyish-attribute.git
+
+host:       L<http://github.com/shelling/rubyish-attribute/tree/master>
+
+checkout:   git clone git://github.com/shelling/rubyish-attribute.git
 
 =head1 BUGS
-    please report bugs to <shelling at cpan.org> or <gugod at gugod.org>
+
+please report bugs to <shelling at cpan.org> or <gugod at gugod.org>
+
 =cut
+
 1;
+
