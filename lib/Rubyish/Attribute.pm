@@ -16,11 +16,11 @@ Sub::Exporter::setup_exporter({
 
 =head1 VERSION
 
-    version 0.02
+version 0.03
 
 =cut
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 =head1 SYNOPSIS
 
@@ -102,7 +102,7 @@ attr_reader create only getter for the class you call it
     attr_reader( [qw(name)] ) # pass an arrayref
     $dogy = Animal->new({name => "rock"}) # if we write initialize function in constructor
     $dogy->name()       #=> rock
-    $dogy->name("jack") #=> cause an exception.
+    $dogy->name("jack") #=> undef (also print err msg)
 
 =cut
 
@@ -114,8 +114,13 @@ sub attr_reader {
     my $make_reader = sub {
         my $field = shift;
         return sub {
-            my $self = shift;
-            $self->{$field};
+            my ($self, $arg) = @_;
+            if ($arg) {
+                print "err - $field is only writer\n";
+                return undef; # return undef because no writer
+            } else {
+                $self->{$field};
+            }
         }
     };
     
@@ -128,10 +133,10 @@ sub attr_reader {
 
 attr_writer create only setter for the class you call it.
 
-    attr_writer( [qw(name)] ) # pass arrayref
+    attr_writer( [qw(name)] ) # pass an arrayref
     $dogy = Animal->new()->name("lucky") # initialize and set and get instance itself
     $dogy->name("jack") #=> instance itself 
-    $dogy->name         #=> undef
+    $dogy->name         #=> undef (also print err msg)
 
 =cut
 
@@ -142,14 +147,14 @@ sub attr_writer {
 
     my $make_writer = sub {
         my $field = shift;
-
         return sub {
             my ($self, $arg) = @_;
             if ($arg) {
                 $self->{$field} = $arg;
                 $self;
-            } else {            # return undef because no reader 
-                return undef;
+            } else {
+                print "err - $field is only writer\n";
+                return undef;            # return undef because no reader 
             }
         }
     };
@@ -159,13 +164,22 @@ sub attr_writer {
     }
 }
 
+=head1 DEPENDENCE
+
+L<Sub::Exporter>
+
 =head1 SEE ALSO
 
-L<autobox::Core>, L<List::Rubyish>
+L<Sub::Exporter>, L<autobox::Core>, L<List::Rubyish>
+
+L<http://ruby-doc.org/core-1.8.7/classes/Module.html#M000423>
+
+L<http://chupei.pm.org/2008/11/rubyish-attribute.html> chinese introduction
 
 =head1 AUTHOR
 
 shelling <navyblueshellingford at gmail.com>
+
 gugod    <gugod at gugod.org>
 
 =head2 acknowledgement
@@ -181,6 +195,12 @@ checkout:   git clone git://github.com/shelling/rubyish-attribute.git
 =head1 BUGS
 
 please report bugs to <shelling at cpan.org> or <gugod at gugod.org>
+
+=head1 COPYRIGHT & LICENCE 
+
+Coryright © 2008 shelling, gugod, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
 =cut
 
