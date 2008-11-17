@@ -1,7 +1,7 @@
 
 =head1 NAME
 
-Rubyish::Attribute - provide ruby-like accessor builder: attr_accessor, attr_writer and attr_reader.
+Rubyish::Attribute - ruby-like accessor builder: attr_accessor, attr_writer and attr_reader.
 
 =cut
 
@@ -9,18 +9,18 @@ package Rubyish::Attribute;
 
 use Sub::Exporter;
 Sub::Exporter::setup_exporter({ 
-    exports => [ qw(attr_accessor attr_writer attr_reader) ] ,
-    groups  => { defaults => [ qw(attr_accessor attr_writer attr_reader) ] },
+    exports => [qw(attr_accessor attr_writer attr_reader)],
+    groups  => { default => [-all] },
 });
 
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =cut
 
-our $VERSION = "0.04";
+our $VERSION = "0.05";
 
 =head1 SYNOPSIS
 
@@ -34,11 +34,11 @@ our $VERSION = "0.04";
     {
         package Animal;
         
-        use Rubyish::Attribute qw(:all); 
-        # use :all to import attr_accessor, attr_writer and attr_reader
+        use Rubyish::Attribute; 
+        # import attr_accessor, attr_writer and attr_reader
 
         attr_accessor( [qw(name color type)] ); 
-        # pass a arrayref as the only one parameter
+        # pass an arrayref as the only one parameter
 
         # then create a constructer based on hashref
         sub new {
@@ -198,7 +198,7 @@ please report bugs to <shelling at cpan.org> or <gugod at gugod.org>
 
 =head1 COPYRIGHT & LICENCE 
 
-Coryright © 2008 shelling, gugod, all rights reserved.
+Copyright © 2008 shelling, gugod, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

@@ -12,7 +12,8 @@ use lib 'lib';
     package Animal;
 
     use Data::Dumper;
-    use Rubyish::Attribute qw(:all);
+    use self;
+    use Rubyish::Attribute;
     
     attr_accessor( [qw(name)] );
     attr_writer( [qw(age)] );
@@ -25,8 +26,11 @@ use lib 'lib';
         $self;
     }
 
-    sub inspect { 
-        print Dumper($_[0]);
+    sub inspect { print Dumper(self) }
+
+    sub add_attr_accessor {
+        attr_accessor($_[1]);
+        self;
     }
 
     1;
@@ -37,6 +41,8 @@ my $dogy = Animal->new({
     age   => 1,
     color => "white",
 });
+
+say "=== simple ===";
 
 say $dogy->age; #=>  undef (with warn msg)
 $dogy->age(2)->inspect;
@@ -51,5 +57,10 @@ say "\n****************************************";
 say $dogy->name; #=> lucky
 $dogy->name("jack")->inspect; 
 
+say "\n=== meta programming ===";
 
+$dogy->add_attr_accessor([qw(master)]);
+$dogy->master("shelling")->inspect;
+
+say "\n****************************************";
 
