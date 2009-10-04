@@ -1,5 +1,4 @@
-package Rubyish::Attribute;
-use 5.010;
+package Rubyish::AttributeOld;
 
 =head1 NAME
 
@@ -7,24 +6,20 @@ Rubyish::Attribute - ruby-like accessor builder: attr_accessor, attr_writer and 
 
 =cut
 
-use Want;
-
-sub import {
-  my $caller = caller;
-  for (qw(attr_accessor attr_reader attr_writer)) {
-    *{$caller . "::" . $_} = *{$_};
-  }
-  eval qq{package $caller; use PadWalker qw(peek_my);};
-}
+use Sub::Exporter;
+Sub::Exporter::setup_exporter({ 
+    exports => [qw(attr_accessor attr_writer attr_reader)],
+    groups  => { default => [-all] },
+});
 
 
 =head1 VERSION
 
-This document is for version 1.1
+This document is for version 1.0
 
 =cut
 
-our $VERSION = "1.1";
+our $VERSION = "1.0";
 
 =head1 SYNOPSIS
 
@@ -48,14 +43,6 @@ our $VERSION = "1.1";
         sub new {
             $class = shift;
             bless {}, $class;
-        }
-
-        sub rename_as {
-          my ($self, $new_name) = @_;
-          __name__ = $new_name;
-
-          # __name__ is accurately a lvalue subroutine &__name__() which refer to $self->{name}
-          # now it looks like a instance variable.
         }
 
         1;
@@ -84,27 +71,24 @@ Each attribute could be read by getter as showing in synopsis.
 
 =cut
 
-
-sub make_accessor {
-    my $field = shift;
-    return sub {
-        my ($self, $arg) = @_;
-        if ($arg) {
-            $self->{$field} = $arg;
-            $self;
-        }
-        else {
-            $self->{$field};
-        }
-    }
-}
-
 sub attr_accessor {
     no strict;
-    my $package = caller;
+
+    my $make_accessor = sub {
+        my $field = shift;
+        return sub {
+            my ($self, $arg) = @_;
+            if ($arg) {
+                $self->{$field} = $arg;
+                $self;
+            } else {
+                $self->{$field};
+            }
+        }
+    };
+
     for my $field (@_) {
-        *{"${package}::${field}"} = make_accessor($field);
-        make_instance_vars_accessor($package, $field);
+        *{(caller)[0] . "::" . $field} = $make_accessor->($field);
     }
 }
 
@@ -119,26 +103,24 @@ attr_reader create only getter for the class you call it
 
 =cut
 
-sub make_reader {
-    my $field = shift;
-    return sub {
-        my ($self, $arg) = @_;
-        if ($arg) {
-            warn "error - $field is only reader\n";
-            return;             # because no writer
-        }
-        else {
-            $self->{$field};
-        }
-    }
-};
-
 sub attr_reader {
     no strict;
-    my $package = caller;
+
+    my $make_reader = sub {
+        my $field = shift;
+        return sub {
+            my ($self, $arg) = @_;
+            if ($arg) {
+                warn "error - $field is only reader\n";
+                return; # because no writer
+            } else {
+                $self->{$field};
+            }
+        }
+    };
+    
     for my $field (@_) {
-        *{"${package}::${field}"} = make_reader($field);
-        make_instance_vars_accessor($package, $field);
+        *{(caller)[0] . "::" . $field} = $make_reader->($field);
     }
 }
 
@@ -153,47 +135,35 @@ attr_writer create only setter for the class you call it.
 
 =cut
 
-sub make_writer {
-    my $field = shift;
-    return sub {
-        my ($self, $arg) = @_;
-        if ($arg) {
-            $self->{$field} = $arg;
-            $self;
-        }
-        else {
-            warn "error - $field is only writer\n";
-            return;             # because no reader 
-        }
-    }
-}
-
 sub attr_writer {
     no strict;
-    my $package = caller;
-    for my $field (@_) {
-        *{"${package}::${field}"} = make_writer($field);
-        make_instance_vars_accessor($package, $field);
-    }
-}
 
-sub make_instance_vars_accessor {
-  no strict;
-  my ($package, $field) = @_;
-  eval qq|package $package;
-    sub __${field}__ : lvalue {
-      \${ peek_my(1)->{\'\$self\'} }->{$field};
+    my $make_writer = sub {
+        my $field = shift;
+        return sub {
+            my ($self, $arg) = @_;
+            if ($arg) {
+                $self->{$field} = $arg;
+                $self;
+            } else {
+                warn "error - $field is only writer\n";
+                return; # because no reader 
+            }
+        }
+    };
+
+    for my $field (@_) {
+        *{(caller)[0] . "::" . $field} = $make_writer->($field);
     }
-  |;
 }
 
 =head1 DEPENDENCE
 
-L<Want>
+L<Sub::Exporter>
 
 =head1 SEE ALSO
 
-L<autobox::Core>, L<List::Rubyish>, L<Class::Accessor::Lvalue>, L<Want>
+L<Sub::Exporter>, L<autobox::Core>, L<List::Rubyish>
 
 L<http://ruby-doc.org/core-1.8.7/classes/Module.html#M000423>
 
@@ -221,9 +191,9 @@ please report bugs to <shelling at cpan.org> or <gugod at gugod.org>
 
 =head1 COPYRIGHT & LICENCE 
 
-Copyright (C) 2008 shelling, gugod, all rights reserved.
+Copyright © 2008 shelling, gugod, all rights reserved.
 
-Release under MIT (X11) Lincence.
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
 =cut
 
