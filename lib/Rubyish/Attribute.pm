@@ -20,11 +20,11 @@ sub import {
 
 =head1 VERSION
 
-This document is for version 1.1
+This document is for version 1.2
 
 =cut
 
-our $VERSION = "1.1";
+our $VERSION = "1.2";
 
 =head1 SYNOPSIS
 
@@ -41,8 +41,11 @@ our $VERSION = "1.1";
         use Rubyish::Attribute; 
         # import attr_accessor, attr_writer and attr_reader
 
-        attr_accessor "name", "color", "type"; 
+        BEGIN {
+          attr_accessor "name", "color", "type"; 
+        }
         # pass a list as the only one parameter
+        # invoke it in compile time to avoid using parenthesis when using instance variable as below
 
         # then create a constructer based on hashref
         sub new {
@@ -182,6 +185,10 @@ sub make_instance_vars_accessor {
   my ($package, $field) = @_;
   eval qq|package $package;
     sub __${field}__ : lvalue {
+      unless ( caller eq $package ) {
+        require Carp;
+        Carp::croak "__${field}__ is a protected method of $package!";
+      }
       \${ peek_my(1)->{\'\$self\'} }->{$field};
     }
   |;

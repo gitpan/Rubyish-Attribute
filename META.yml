@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Rubyish-Attribute
-version:            1.1
+version:            1.2
 abstract:           ruby-like accessor builder: attr_accessor, attr_writer and attr_reader.
 author:
     - shelling, <navyblueshellingford@gmail.com>
